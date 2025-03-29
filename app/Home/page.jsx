@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 import React, { useState } from "react";
 import Head from "next/head";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -10,20 +10,22 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { useRouter } from 'next/navigation'
+import { Menu, X } from "lucide-react";
 
 
 export default function HomeComponent() {
-    
+
 
     const [selectedImage, setSelectedImage] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [openIndex, setOpenIndex] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
     const router = useRouter()
 
 
 
     const images = [
-       
+
         "/img1.png",
         "/img2.png",
         "/img3.png",
@@ -81,10 +83,10 @@ export default function HomeComponent() {
         },
     ];
 
-    
+
     return (
 
-        
+
 
         <div className="bg-black text-white min-h-screen">
             <Head>
@@ -117,14 +119,30 @@ export default function HomeComponent() {
                 {/* Navigation Bar */}
                 <header className="absolute top-0 left-0 w-full flex justify-between items-center p-6 z-20">
                     <img className="h-auto rounded-full w-16 sm:w-28 md:w-32 lg:w-40 xl:w-48" src="/logo.png" alt="Logo" />
-                    <nav>
-                        <ul className="flex justify-end space-x-10 mt-1 text-3xl font-semibold mr-8 pr-8">
-                            <li><a  onClick={() => router.push('/Home')} className="hover:text-gray-300">Home</a></li>
-                            <li><a  onClick={() => router.push('/Gallery')} className="hover:text-gray-300">Gallery</a></li>
-                            <li><a  onClick={() => router.push('/About')} className="hover:text-gray-300">About us</a></li>
-                            <li><a  onClick={() => router.push('/Contact')} className="hover:text-gray-300">Contact us</a></li>
+                    {/* Desktop Navigation */}
+                    <nav className="hidden md:flex md:items-center">
+                        <ul className="flex space-x-10 text-white text-2xl font-semibold">
+                            <li><a onClick={() => router.push('/Home')} className="hover:text-gray-300 cursor-pointer">Home</a></li>
+                            <li><a onClick={() => router.push('/Gallery')} className="hover:text-gray-300 cursor-pointer">Gallery</a></li>
+                            <li><a onClick={() => router.push('/About')} className="hover:text-gray-300 cursor-pointer">About us</a></li>
+                            <li><a onClick={() => router.push('/Contact')} className="hover:text-gray-300 cursor-pointer">Contact us</a></li>
                         </ul>
                     </nav>
+
+                    {/* Mobile Menu Button */}
+                    <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-white focus:outline-none">
+                        {isOpen ? <X size={30} /> : <Menu size={30} />}
+                    </button>
+
+                    {/* Mobile Navigation */}
+                    {isOpen && (
+                        <nav className="absolute top-20 left-0 w-full bg-gray-800 text-white p-6 flex flex-col items-center space-y-4 md:hidden">
+                            <a onClick={() => { setIsOpen(false); router.push('/Home'); }} className="hover:text-gray-300 cursor-pointer">Home</a>
+                            <a onClick={() => { setIsOpen(false); router.push('/Gallery'); }} className="hover:text-gray-300 cursor-pointer">Gallery</a>
+                            <a onClick={() => { setIsOpen(false); router.push('/About'); }} className="hover:text-gray-300 cursor-pointer">About us</a>
+                            <a onClick={() => { setIsOpen(false); router.push('/Contact'); }} className="hover:text-gray-300 cursor-pointer">Contact us</a>
+                        </nav>
+                    )}
                 </header>
 
                 {/* Main Text Content */}
@@ -138,79 +156,67 @@ export default function HomeComponent() {
                 </div>
             </section>
 
-            {/* Gallery Section */}
-            <section id="gallery" className="p-10">
-                <h2 className="text-6xl font-bold text-center mt-20 mb-20">Gallery</h2>
+            <section id="gallery" className="p-5 sm:p-10">
+            <h2 className="text-4xl sm:text-6xl font-bold text-center mt-10 sm:mt-20 mb-10 sm:mb-20">Gallery</h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    {images.map((src, index) => (
-                        <div key={index} className="group relative overflow-hidden rounded-lg">
-                            <img
-                                src={src}
-                                alt={`Gallery ${index + 1}`}
-                                className="w-full h-full object-cover transition-transform duration-500 ease-in-out transform group-hover:scale-110 cursor-pointer"
-                                onClick={() => openImage(index)}
-                            />
-                        </div>
-                    ))}
-                </div>
-
-                {/* Image Modal with Navigation */}
-                {selectedImage && (
-                    <div
-                        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80"
-                        onClick={() => setSelectedImage(null)}
-                    >
-                        <div className="relative w-full h-full flex items-center justify-center">
-                            {/* Close Button (Top-Right Corner) */}
-                            <button
-                                className="absolute top-2 right-2  text-white mr-4 mt-4 p-2 text-3xl hover:bg-gray-900"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedImage(null);
-                                }}
-                            >
-                                ✕
-                            </button>
-
-                            {/* Previous Arrow (Extreme Left) */}
-                            {currentIndex > 0 && (
-                                <button
-                                    className="absolute left-2 top-1/2 transform -translate-y-1/2  text-white ml-4 p-3 text-3xl hover:bg-gray-900"
-                                    onClick={prevImage}
-                                >
-                                    <FontAwesomeIcon icon={faArrowLeft} />
-                                </button>
-                            )}
-
-                            {/* Image */}
-                            <img
-                                src={selectedImage}
-                                alt="Selected"
-                                className="max-w-full max-h-[90vh] rounded-lg shadow-lg"
-                            />
-
-                            {/* Next Arrow (Extreme Right) */}
-                            {currentIndex < images.length - 1 && (
-                                <button
-                                    className="absolute right-2 top-1/2 transform -translate-y-1/2  text-white rounded-full p-3 mr-4 text-3xl hover:bg-gray-900"
-                                    onClick={nextImage}
-                                >
-                                    <FontAwesomeIcon icon={faArrowRight} />
-                                </button>
-                            )}
-                        </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+                {images.map((src, index) => (
+                    <div key={index} className="group relative overflow-hidden rounded-lg">
+                        <img
+                            src={src}
+                            alt={`Gallery ${index + 1}`}
+                            className="w-full h-40 sm:h-60 md:h-72 object-cover transition-transform duration-500 ease-in-out transform group-hover:scale-110 cursor-pointer"
+                            onClick={() => openImage(index)}
+                        />
                     </div>
-                )}
+                ))}
+            </div>
 
-                {/* View More Button */}
-                <div className="text-center mt-6">
-                    <button type="button" className="mt-10 inline-block bg-black text-white px-6 py-3 rounded-lg text-2xl font-semibold transition-all duration-300 hover:bg-gray-500" onClick={() => router.push('/Gallery')}>
-                        View More
-                    </button>
-             
+            {selectedImage && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50" onClick={() => setSelectedImage(null)}>
+                    <div className="relative w-full max-w-3xl flex items-center justify-center p-4">
+                        <button
+                            className="absolute top-4 right-4 text-white text-3xl hover:bg-gray-900 p-2 rounded-full"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedImage(null);
+                            }}
+                        >
+                            ✕
+                        </button>
+
+                        {currentIndex > 0 && (
+                            <button
+                                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:bg-gray-900 p-2 rounded-full"
+                                onClick={prevImage}
+                            >
+                                <FontAwesomeIcon icon={faArrowLeft} />
+                            </button>
+                        )}
+
+                        <img src={selectedImage} alt="Selected" className="max-w-full max-h-[90vh] rounded-lg shadow-lg" />
+
+                        {currentIndex < images.length - 1 && (
+                            <button
+                                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:bg-gray-900 p-2 rounded-full"
+                                onClick={nextImage}
+                            >
+                                <FontAwesomeIcon icon={faArrowRight} />
+                            </button>
+                        )}
+                    </div>
                 </div>
-            </section>
+            )}
+
+            <div className="text-center mt-6">
+                <button 
+                    type="button" 
+                    className="mt-10 bg-black text-white px-6 py-3 rounded-lg text-lg sm:text-2xl font-semibold transition-all duration-300 hover:bg-gray-500" 
+                    onClick={() => router.push('/Gallery')}>
+                    View More
+                </button>
+            </div>
+        </section>
             {/* About Section */}
             <h2 className="text-6xl font-bold text-center mt-10 mb-3">About </h2>
             <section id="about" className="p-10 bg-black text-white flex items-center justify-center min-h-screen">
@@ -377,5 +383,4 @@ export default function HomeComponent() {
         </div>
     );
 }
-
 
